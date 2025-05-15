@@ -3,8 +3,7 @@
 
 # build output
 /dist/
-/docs/                # if you’re using the docs/ folder for GitHub Pages,
-                      # otherwise ignore this line
+/docs/
 
 # dotenv environment variables
 /.env.local

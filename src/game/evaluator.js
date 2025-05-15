@@ -1,4 +1,4 @@
-const payouts = {
+export const payouts = {
     'Royal Flush':      250,
     'Straight Flush':    50,
     'Four of a Kind':    25,
