@@ -8,7 +8,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import PokerGame from './components/PokerGame.vue';
-export default { components: { PokerGame } };
+
+export default defineComponent({
+  name: 'App',
+  components: { PokerGame },
+});
 </script>
