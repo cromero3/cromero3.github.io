@@ -1,35 +1,21 @@
-name: Build and Deploy to GitHub Pages
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
+      - uses: actions/checkout@v3
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
-
       - name: Install dependencies
         run: pnpm install
-
       - name: Build site
         run: pnpm run build
-
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v3
-
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: docs
-
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
