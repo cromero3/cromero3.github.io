@@ -1,4 +1,10 @@
 name: Build and Deploy to Github Pages
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  
 on:
   push:
     branches:
