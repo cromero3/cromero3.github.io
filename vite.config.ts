@@ -1,18 +1,23 @@
 import { fileURLToPath, URL } from 'node:url'
+import { defineConfig }    from 'vite'
+import vue                 from '@vitejs/plugin-vue'
+import vueDevTools         from 'vite-plugin-vue-devtools'
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
-
-// https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  base: '/',
   plugins: [
     vue(),
-    vueDevTools(),
-  ],
+    command === 'serve' && vueDevTools(),
+  ].filter(Boolean),
+
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-})
+
+  build: {
+    outDir: 'docs',
+    emptyOutDir: true,
+  },
+}))

@@ -3,7 +3,6 @@
 
 # build output
 /dist/
-/docs/
 
 # dotenv environment variables
 /.env.local

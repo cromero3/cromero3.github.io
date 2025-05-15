@@ -2,11 +2,11 @@
   <div class="p-4">
     <!-- Deal / Draw Buttons -->
     <div class="space-x-2 mb-4">
-      <button @click="deal":disabled="phase =='draw' "class="px-4 py-2 bg-blue-500 text-white rounded border border-blue-700">
+      <button @click="deal":disabled="phase == 'draw'" class="px-4 py-2 bg-blue-500 text-white rounded border border-blue-700">
         Deal
         {{ phase === 'results' ? 'New Game' : 'Deal' }}
       </button>
-      <button @click="draw":disabled="phase!=='draw' "class="px-4 py-2 bg-green-500 text-white rounded border border-green-700">
+      <button @click="draw":disabled="phase !== 'draw'" class="px-4 py-2 bg-green-500 text-white rounded border border-green-700">
         Draw
       </button>
     </div>
@@ -34,8 +34,8 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import Card from './Card.vue';
-import { createDeck, shuffle } from '../game/deck';
-import { evaluateHand, payout } from '../game/evaluator';
+import { createDeck, shuffle } from '../game/deck.js';
+import { evaluateHand, payouts } from '../game/evaluator.js';
 
 export default defineComponent({
   name: 'PokerGame',
