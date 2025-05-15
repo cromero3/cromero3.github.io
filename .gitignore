@@ -1,30 +1,39 @@
-# Logs
-logs
-*.log
+# dependencies
+/node_modules/
+
+# build output
+/dist/
+/docs/                # if you’re using the docs/ folder for GitHub Pages,
+                      # otherwise ignore this line
+
+# dotenv environment variables
+/.env.local
+/.env.*.local
+
+# log files
 npm-debug.log*
+pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-.DS_Store
-dist
-dist-ssr
-coverage
-*.local
+# Test coverage
+/coverage/
+/*.lcov
 
-/cypress/videos/
-/cypress/screenshots/
+# Vite cache
+/.vite/
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+/.vscode/
+/.idea/
+/*.suo
+/*.ntvs*
+/*.njsproj
+/*.sln
 
-*.tsbuildinfo
+# OS junk
+.DS_Store
+Thumbs.db
+
+/package-lock.json
+/yarn.lock
