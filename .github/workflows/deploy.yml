@@ -6,10 +6,8 @@ on:
       - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    outputs:
-      pages_artifact: ${{ steps.upload-pages-artifact.outputs.artifact_name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -25,17 +23,13 @@ jobs:
       - name: Build site
         run: pnpm run build
 
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v3
+
       - name: Upload pages artifact
-        id: upload-pages-artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: docs
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
-        with:
-          artifact_name: ${{ needs.build.outputs.pages_artifact }}
