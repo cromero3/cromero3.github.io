@@ -1,8 +1,8 @@
 <template>
   <div
-    class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    class="h-screen overflow-hidden flex items-center justify-center bg-gray-100 p-4">
     <div
-      class="w-full max-w-full sm:max-w-3xl transform origin-top scale-100 sm:scale-110">
+      class="w-full max-w-3xl mx-auto">
       <PokerGame />
     </div>
   </div>

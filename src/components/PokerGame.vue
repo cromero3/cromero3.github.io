@@ -12,11 +12,11 @@
         />
       </div>
 
-      <!-- Controls -->
-      <div class="flex justify-center gap-4 mb-4">
+      <!-- controls -->
+      <div class="flex justify-center mb-4">
         <button
-          @click="deal"
-          :disabled="phase === 'draw'"
+          @click="handleAction"
+          :disabled="(phase === 'draw' && buttonLabel === 'Deal')"
           class="
             px-4 py-2 rounded font-semibold
             text-lg sm:text-xl md:text-2xl
@@ -24,19 +24,7 @@
             disabled:opacity-50 disabled:cursor-not-allowed
           "
         >
-          {{ phase === 'results' ? 'New Game' : 'Deal' }}
-        </button>
-        <button
-          @click="draw"
-          :disabled="phase !== 'draw'"
-          class="
-            px-4 py-2 rounded font-semibold
-            text-lg sm:text-xl md:text-2xl
-            bg-green-500 text-white border border-green-700
-            disabled:opacity-50 disabled:cursor-not-allowed
-          "
-        >
-          Draw
+          {{ buttonLabel }}
         </button>
       </div>
 
@@ -55,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import Card from './Card.vue';
 import { createDeck, shuffle } from '../game/deck';
 import { evaluateHand } from '../game/evaluator';
@@ -98,7 +86,30 @@ export default defineComponent({
       phase.value = 'results';
     }
 
-    return { credits, hand, held, phase, result, deal, toggleHold, draw };
+    const buttonLabel = computed(() => {
+      if (phase.value === 'bet') return 'Deal';
+      if (phase.value === 'draw') return 'Draw';
+      return 'New Game';
+    });
+
+    function handleAction() {
+      if (phase.value === 'bet' || phase.value === 'results') {
+        deal();
+      } else {
+        draw();
+      }
+    }
+
+    return {
+      credits,
+      hand,
+      held,
+      phase,
+      result,
+      toggleHold,
+      buttonLabel,
+      handleAction,
+    };
   },
 });
 </script>
