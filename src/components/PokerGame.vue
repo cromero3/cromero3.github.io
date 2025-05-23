@@ -12,19 +12,33 @@
         />
       </div>
 
-      <!-- controls -->
-      <div class="flex justify-center mb-4">
+      <!-- Controls: Bet+1, Action, Max Bet -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+        <!-- Main action button (center on desktop, top on mobile) -->
         <button
           @click="handleAction"
-          :disabled="(phase === 'draw' && buttonLabel === 'Deal')"
-          class="
-            px-4 py-2 rounded font-semibold
-            text-lg sm:text-xl md:text-2xl
-            bg-blue-500 text-white border border-blue-700
-            disabled:opacity-50 disabled:cursor-not-allowed
-          "
+          :class="actionClasses"
+          class="order-1 sm:order-2 w-full sm:w-auto"
         >
           {{ buttonLabel }}
+        </button>
+        <!-- Bet +1 button (left on desktop, middle on mobile) -->
+        <button
+          @click="increaseBet"
+          :disabled="phase === 'draw' || betAmount >= 5"
+          :class="betButtonClasses"
+          class="order-2 sm:order-1 w-full sm:w-auto"
+        >
+          Bet {{ betAmount }}x
+        </button>
+        <!-- Max Bet button (right on desktop, bottom on mobile) -->
+        <button
+          @click="maxBet"
+          :disabled="phase === 'draw' || betAmount >= 5"
+          :class="betButtonClasses"
+          class="order-3 sm:order-3 w-full sm:w-auto"
+        >
+          Max Bet
         </button>
       </div>
 
@@ -53,17 +67,18 @@ export default defineComponent({
   components: { Card },
   setup() {
     const credits = ref(100);
-    const bet = 1;
+    const betAmount = ref(1);
     const deck = ref<{ rank: string; suit: string }[]>([]);
     const hand = ref<{ rank: string; suit: string }[]>([]);
     const held = ref<boolean[]>([false, false, false, false, false]);
-    const phase = ref<'bet'|'draw'|'results'>('bet');
-    const result = ref<{ name: string; payout: number }|null>(null);
+    const phase = ref<'bet' | 'draw' | 'results'>('bet');
+    const result = ref<{ name: string; payout: number } | null>(null);
 
     function deal() {
       phase.value = 'bet';
-      if (credits.value < bet) return;
-      credits.value -= bet;
+      // betAmount remains whatever user set
+      if (credits.value < betAmount.value) return;
+      credits.value -= betAmount.value;
       deck.value = shuffle(createDeck());
       hand.value = deck.value.splice(0, 5);
       held.value = [false, false, false, false, false];
@@ -82,8 +97,10 @@ export default defineComponent({
       );
       const r = evaluateHand(hand.value);
       result.value = r;
-      credits.value += r.payout * bet;
+      credits.value += (r.payout || 0) * betAmount.value;
       phase.value = 'results';
+      // reset bet after round completion
+      betAmount.value = 1;
     }
 
     const buttonLabel = computed(() => {
@@ -91,6 +108,28 @@ export default defineComponent({
       if (phase.value === 'draw') return 'Draw';
       return 'New Game';
     });
+
+    const actionClasses = computed(() => [
+      'w-full sm:w-auto px-4 py-2 rounded font-semibold text-lg sm:text-xl md:text-2xl text-white disabled:opacity-50 disabled:cursor-not-allowed',
+      phase.value === 'draw'
+        ? 'bg-green-500 border border-green-700'
+        : 'bg-blue-500 border border-blue-700'
+    ]);
+
+    const betButtonClasses = computed(() => [
+      'w-full sm:w-auto px-4 py-2 rounded font-medium text-base sm:text-lg bg-gray-200 text-gray-800 border border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed'
+    ]);
+
+    function increaseBet() {
+      // only disable during draw, allow in results phase
+      if (phase.value === 'draw') return;
+      if (betAmount.value < 5) betAmount.value++;
+    }
+
+    function maxBet() {
+      if (phase.value === 'draw') return;
+      betAmount.value = 5;
+    }
 
     function handleAction() {
       if (phase.value === 'bet' || phase.value === 'results') {
@@ -102,12 +141,17 @@ export default defineComponent({
 
     return {
       credits,
+      betAmount,
       hand,
       held,
       phase,
       result,
       toggleHold,
       buttonLabel,
+      actionClasses,
+      increaseBet,
+      maxBet,
+      betButtonClasses,
       handleAction,
     };
   },
