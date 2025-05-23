@@ -1,40 +1,41 @@
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
     <div class="w-full max-w-3xl mx-auto">
-      <!-- Card row: exactly 5 equal columns with gap -->
+
+      <!-- Card row: blank backs in 'bet', faces in 'draw'/'results' -->
       <div class="grid grid-cols-5 gap-4 mb-6">
         <Card
-          v-for="(c, i) in hand"
+          v-for="i in 5"
           :key="i"
-          :card="c"
-          :held="held[i]"
-          @toggle-hold="() => toggleHold(i)"
+          :face-down="phase === 'bet'"
+          :card="phase === 'bet' ? undefined : hand[i - 1]"
+          :held="phase !== 'bet' && held[i - 1]"
+          @toggle-hold="() => toggleHold(i - 1)"
         />
       </div>
 
-      <!-- Controls: Bet+1, Action, Max Bet -->
+      <!-- Controls: Bet+1, Deal/Draw/New Game, Max Bet -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
-        <!-- Main action button (center on desktop, top on mobile) -->
+        <button
+          @click="increaseBet"
+          :disabled="phase !== 'bet' || betAmount >= 5"
+          :class="betButtonClasses"
+          class="order-1 sm:order-1 w-full sm:w-auto"
+        >
+          Bet {{ betAmount }}×
+        </button>
+
         <button
           @click="handleAction"
           :class="actionClasses"
-          class="order-1 sm:order-2 w-full sm:w-auto"
+          class="order-2 sm:order-2 w-full sm:w-auto"
         >
           {{ buttonLabel }}
         </button>
-        <!-- Bet +1 button (left on desktop, middle on mobile) -->
-        <button
-          @click="increaseBet"
-          :disabled="phase === 'draw' || betAmount >= 5"
-          :class="betButtonClasses"
-          class="order-2 sm:order-1 w-full sm:w-auto"
-        >
-          Bet {{ betAmount }}x
-        </button>
-        <!-- Max Bet button (right on desktop, bottom on mobile) -->
+
         <button
           @click="maxBet"
-          :disabled="phase === 'draw' || betAmount >= 5"
+          :disabled="phase !== 'bet' || betAmount >= 5"
           :class="betButtonClasses"
           class="order-3 sm:order-3 w-full sm:w-auto"
         >
@@ -59,6 +60,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import Card from './Card.vue';
+import type { Card as CardType } from '../game/deck';
 import { createDeck, shuffle } from '../game/deck';
 import { evaluateHand } from '../game/evaluator';
 
@@ -68,15 +70,14 @@ export default defineComponent({
   setup() {
     const credits = ref(100);
     const betAmount = ref(1);
-    const deck = ref<{ rank: string; suit: string }[]>([]);
-    const hand = ref<{ rank: string; suit: string }[]>([]);
-    const held = ref<boolean[]>([false, false, false, false, false]);
+    const deck = ref<CardType[]>([]);
+    const hand = ref<CardType[]>([]);
+    const held = ref([false, false, false, false, false]);
     const phase = ref<'bet' | 'draw' | 'results'>('bet');
     const result = ref<{ name: string; payout: number } | null>(null);
 
     function deal() {
       phase.value = 'bet';
-      // betAmount remains whatever user set
       if (credits.value < betAmount.value) return;
       credits.value -= betAmount.value;
       deck.value = shuffle(createDeck());
@@ -99,8 +100,7 @@ export default defineComponent({
       result.value = r;
       credits.value += (r.payout || 0) * betAmount.value;
       phase.value = 'results';
-      // reset bet after round completion
-      betAmount.value = 1;
+      betAmount.value = 1; // reset bet
     }
 
     const buttonLabel = computed(() => {
@@ -121,13 +121,12 @@ export default defineComponent({
     ]);
 
     function increaseBet() {
-      // only disable during draw, allow in results phase
-      if (phase.value === 'draw') return;
+      if (phase.value !== 'bet') return;
       if (betAmount.value < 5) betAmount.value++;
     }
 
     function maxBet() {
-      if (phase.value === 'draw') return;
+      if (phase.value !== 'bet') return;
       betAmount.value = 5;
     }
 
