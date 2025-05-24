@@ -1,6 +1,13 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+  <div class="min-h-screen flex flex-col items-center justify-center bg-blue-900 p-4">
     <div class="w-full max-w-3xl mx-auto">
+
+      <!-- Status -->
+      <div class="text-center space-y-1">
+        <p v-if="result" class="text-lg sm:text-xl md:text-2xl text-yellow-400">
+          <strong> {{ result.name }} </strong>
+        </p>
+      </div>
 
       <!-- Card row: blank backs in 'bet', faces in 'draw'/'results' -->
       <div class="grid grid-cols-5 gap-4 mb-6">
@@ -41,17 +48,11 @@
         >
           Max Bet
         </button>
-      </div>
-
-      <!-- Status -->
-      <div class="text-center space-y-1">
-        <p class="text-lg sm:text-xl md:text-2xl">
+        <div class="text-center space-y-1">
+          <p class="text-lg sm:text-xl md:text-2xl text-yellow-400">
           <strong>Credits:</strong> {{ credits }}
-        </p>
-        <p v-if="result" class="text-lg sm:text-xl md:text-2xl">
-          <strong>Result:</strong> {{ result.name }}
-          <span v-if="result.payout">(+{{ result.payout }}× bet)</span>
-        </p>
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -72,19 +73,32 @@ export default defineComponent({
     const betAmount = ref(1);
     const deck = ref<CardType[]>([]);
     const hand = ref<CardType[]>([]);
-    const held = ref([false, false, false, false, false]);
+    const held = ref<boolean[]>([false, false, false, false, false]);
+    // three phases: bet → draw → results → back to bet
     const phase = ref<'bet' | 'draw' | 'results'>('bet');
     const result = ref<{ name: string; payout: number } | null>(null);
 
     function deal() {
-      phase.value = 'bet';
+      // only callable in 'bet' phase
       if (credits.value < betAmount.value) return;
       credits.value -= betAmount.value;
       deck.value = shuffle(createDeck());
       hand.value = deck.value.splice(0, 5);
       held.value = [false, false, false, false, false];
-      phase.value = 'draw';
       result.value = null;
+      phase.value = 'draw';
+    }
+
+    function draw() {
+      // only callable in 'draw' phase
+      hand.value = hand.value.map((card, i) =>
+        held.value[i] ? card : deck.value.shift()!
+      );
+      const r = evaluateHand(hand.value);
+      result.value = r;
+      credits.value += (r.payout || 0) * betAmount.value;
+      betAmount.value = 1;         // reset bet for next round
+      phase.value = 'results';
     }
 
     function toggleHold(i: number) {
@@ -92,15 +106,17 @@ export default defineComponent({
       held.value[i] = !held.value[i];
     }
 
-    function draw() {
-      hand.value = hand.value.map((card, i) =>
-        held.value[i] ? card : deck.value.shift()!
-      );
-      const r = evaluateHand(hand.value);
-      result.value = r;
-      credits.value += (r.payout || 0) * betAmount.value;
-      phase.value = 'results';
-      betAmount.value = 1; // reset bet
+    function handleAction() {
+      // Deal / Draw / New Game behavior based on phase
+      if (phase.value === 'bet') {
+        deal();
+      } else if (phase.value === 'draw') {
+        draw();
+      } else /* results */ {
+        // go back to betting for the next hand
+        phase.value = 'bet';
+        result.value = null;
+      }
     }
 
     const buttonLabel = computed(() => {
@@ -130,14 +146,6 @@ export default defineComponent({
       betAmount.value = 5;
     }
 
-    function handleAction() {
-      if (phase.value === 'bet' || phase.value === 'results') {
-        deal();
-      } else {
-        draw();
-      }
-    }
-
     return {
       credits,
       betAmount,
@@ -148,9 +156,9 @@ export default defineComponent({
       toggleHold,
       buttonLabel,
       actionClasses,
+      betButtonClasses,
       increaseBet,
       maxBet,
-      betButtonClasses,
       handleAction,
     };
   },

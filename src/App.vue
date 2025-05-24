@@ -1,6 +1,6 @@
 <template>
   <div
-    class="h-screen overflow-hidden flex items-center justify-center bg-gray-100 p-4">
+    class="h-screen overflow-hidden flex items-center justify-center bg-blue-900 p-4">
     <div
       class="w-full max-w-3xl mx-auto">
       <PokerGame />
