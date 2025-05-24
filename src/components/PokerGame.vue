@@ -3,16 +3,16 @@
     <div class="w-full max-w-4xl mx-auto">
 
     <!-- Payouts Table -->
-    <div class="overflow-hidden mb-6">
-      <table class="w-full table-auto border-collapse border border-yellow-400 text-white text-sm">
+    <div class="overflow-x-auto mb-6">
+      <table class="w-full table-auto border-collapse border border-yellow-300 text-white text-sm">
         <thead>
           <tr class="bg-blue-800">
-            <th class="px-3 py-2 text-left">Hand</th>
+            <th class="px-3 py-4 text-left">Hand</th>
             <th
               v-for="b in bets"
               :key="b"
               :class="[
-                'px-3 py-2 text-center',
+                'px-3 py-3 text-center',
                 b === betAmount ? 'bg-red-600 text-white' : ''
               ]"
             >
@@ -26,12 +26,12 @@
             :key="row.name"
             class="even:bg-blue-800"
           >
-          <td class="px-3 py-1 font-medium">{{ row.name }}</td>
+          <td class="px-3 py-2 font-medium">{{ row.name }}</td>
           <td
             v-for="(val, idx) in row.values"
             :key="idx"
             :class="[
-              'px-3 py-1 text-center text-yellow-400',
+              'px-3 py-2 text-center text-yellow-300 font-bold',
               bets[idx] === betAmount ? 'bg-red-600' : ''
             ]"
           >
@@ -43,15 +43,15 @@
     </div>
 
       <!-- Status -->
-      <div class="text-center space-y-1 mb-4">
+      <div class="text-center space-y-1 mb-4 min-h-[3rem]">
         <p
           v-if="result"
           :class="[
-            'text-lg sm:text-xl md:text-2xl font-semibold',
-            result.payout > 0 ? 'text-green-400' : 'text-red-400'
+            'text-4xl sm:text-4xl md:text-4xl font-semibold',
+            result.payout > 0 ? 'text-yellow-300' : 'text-red-400'
           ]"
         >
-          <strong> {{ result.name }} </strong>
+        {{ result.name }}
         </p>
       </div>
 
@@ -68,13 +68,13 @@
       </div>
 
         <div class="text-center space-y-1 mb-4">
-          <p class="text-lg sm:text-xl md:text-2xl text-yellow-400">
-            <strong>Credits:</strong> {{ credits }}
+          <p class="text-3xl sm:text-3xl md:text-3xl text-yellow-300 font-semibold">
+            Credits: {{ credits }}
           </p>
         </div>
 
       <!-- Controls: Bet+1, Deal/Draw/New Game, Max Bet -->
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4">
         <button
           @click="increaseBet"
           :disabled="phase !== 'bet' || betAmount >= 5"

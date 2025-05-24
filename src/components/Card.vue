@@ -21,11 +21,13 @@
     </div>
 
     <!-- HELD badge -->
-    <div
-      v-if="!faceDown && held"
-      class="mt-1 text-sm sm:text-base md:text-lg text-green-600 text-center"
-    >
-      HELD
+    <div class="mt-1 min-h-[1.5rem] text-center">
+      <span 
+        v-if="!faceDown && held"
+        class="mt-1 text-sm sm:text-base md:text-lg text-green-400 font-bold text-center"
+      >
+        HELD
+      </span>
     </div>
   </div>
 </template>
