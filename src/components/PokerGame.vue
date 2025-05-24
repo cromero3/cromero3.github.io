@@ -67,7 +67,7 @@
         />
       </div>
 
-        <div class="text-center space-y-1 mb-4">
+        <div class="text-center space-y-1 mb-2">
           <p class="text-3xl sm:text-3xl md:text-3xl text-yellow-300 font-semibold">
             Credits: {{ credits }}
           </p>

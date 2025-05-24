@@ -21,7 +21,7 @@
     </div>
 
     <!-- HELD badge -->
-    <div class="mt-1 min-h-[1.5rem] text-center">
+    <div class="mt-1 text-center min-h-[1.25rem] sm:min-h-[1.5rem] md:min-h-[1.75rem]">
       <span 
         v-if="!faceDown && held"
         class="mt-1 text-sm sm:text-base md:text-lg text-green-400 font-bold text-center"
